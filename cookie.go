@@ -11,6 +11,7 @@ import (
 )
 
 type Cookie struct {
+	debug   bool
 	redis   *redis.Client
 	PassKey string
 	Key     string
@@ -25,6 +26,7 @@ func NewCookie(conf Config) *Cookie {
 		DB:       0,
 	})
 	return &Cookie{
+		debug:   conf.Debug,
 		config:  conf.LoginConfig,
 		Key:     conf.RedisConfig.CookieKey,
 		PassKey: conf.RedisConfig.PassKey,
@@ -47,10 +49,14 @@ func (c *Cookie) Cookie() (cookies []*http.Cookie) {
 			LcId:     c.config.LcId,
 			Password: pass,
 		}
-		resp, _ := req.C().SetBaseURL(c.config.Host).
-			SetCommonContentType("application/json").R().
+		cli := req.C().SetBaseURL(c.config.Host).SetCommonContentType("application/json")
+		if c.debug {
+			cli = cli.DevMode()
+		}
+		resp, _ := cli.R().
 			SetBody(request).
 			Post(LOGIN_API)
+
 		if resp.IsSuccessState() {
 			cookies = resp.Cookies()
 		}

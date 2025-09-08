@@ -5,6 +5,7 @@ import (
 )
 
 type Config struct {
+	Debug       bool
 	LoginConfig LoginConfig
 	RedisConfig RedisConfig
 }

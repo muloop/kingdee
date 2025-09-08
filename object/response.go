@@ -20,8 +20,9 @@ func (o *Org) UnmarshalJSON(data []byte) error {
 	if len(raw) != 3 {
 		return fmt.Errorf("invalid array length: %d", len(raw))
 	}
-
-	o.ID, _ = raw[0].(int64)
+	if _, ok := raw[0].(float64); ok {
+		o.ID = int64(raw[0].(float64))
+	}
 	o.Number, _ = raw[1].(string)
 	o.Name, _ = raw[2].(string)
 

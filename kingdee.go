@@ -8,6 +8,7 @@ import (
 
 type KingDee struct {
 	ctx     context.Context
+	debug   bool
 	baseUrl string
 	client  *req.Client
 	cookie  *Cookie
@@ -23,6 +24,7 @@ func New(ctx context.Context, c Config) (*KingDee, error) {
 	cookie := NewCookie(c)
 	kingDee := &KingDee{
 		ctx:     ctx,
+		debug:   c.Debug,
 		baseUrl: c.LoginConfig.Host,
 		cookie:  cookie,
 		json:    NewSafeJSONPool(),
@@ -88,5 +90,6 @@ func (k *KingDee) ExecuteBillQuery(data object.ExecuteBillQueryData, resp any) *
 }
 
 func (k *KingDee) call(url, body string, resp any) *req.Response {
-	return NewClient(k.cookie, k.baseUrl, url, body).SetSuccessResult(resp).Do(k.ctx)
+
+	return NewClient(k.cookie, k.baseUrl, url, body, k.debug).SetSuccessResult(resp).Do(k.ctx)
 }
